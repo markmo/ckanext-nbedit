@@ -75,6 +75,34 @@ Tested with CKAN Version 2.8.3.
 
 
 ------------
+Design Notes
+------------
+
+An API Token will be setup as a service account to JupyterHub.
+
+A new CKAN Project will create a corresponding group in JupyterHub for
+administrative and reporting purposes.
+
+**Create Project Sequence Diagram**
+
+.. image:: docs/images/create_project_seq_diag.png
+   :width: 700
+   :alt: Create Project Sequence Diagram
+
+Similarly, a CKAN User will match a corresponding JupyterHub User, 
+automatically created.
+A token will be requested for each user from the JupyterHub API, and
+used to make subsequent requests to the spawned Jupyter Server on
+behalf of the user in the CKAN session.
+
+**Start Notebook Server Sequence Diagram**
+
+.. image:: docs/images/start_notebook_server_seq_diag.png
+   :width: 700
+   :alt: Start Notebook Server Sequence Diagram
+
+
+------------
 Installation
 ------------
 
