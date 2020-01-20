@@ -1,0 +1,28 @@
+.spinner {
+  display: inline-block;
+  opacity: 0;
+  max-width: 0;
+  -webkit-transition: opacity 0.25s, max-width 0.45s;
+  -moz-transition: opacity 0.25s, max-width 0.45s;
+  -o-transition: opacity 0.25s, max-width 0.45s;
+  transition: opacity 0.25s, max-width 0.45s;
+}
+
+.has-spinner.active {
+  cursor: progress;
+}
+
+.has-spinner.active .spinner {
+  opacity: 1;
+  max-width: 50px;
+}
+
+#start-server-btn, #stop-server-btn {
+  width: 126px;
+}
+
+.nbedit-notice {
+  text-align: center;
+  font-weight: 600;
+  font-style: italic;
+}

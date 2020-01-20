@@ -1,0 +1,8 @@
+{% resource 'nbedit/nbedit-start-server.js' %}
+{% resource 'nbedit/nbedit-stop-server.js' %}
+{% resource 'nbedit/nbedit.css' %}
+{% if server_is_running %}
+    <iframe id="nbeditor" src="{{ jupyter_user_url }}" style="width: 100%;"></iframe>
+{% else %}
+    <p class="nbedit-notice">Start Server to open notebook</p>
+{% endif %}
