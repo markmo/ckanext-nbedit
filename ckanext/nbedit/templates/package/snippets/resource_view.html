@@ -59,7 +59,7 @@
           </p>
         </div>
         {% if not to_preview %}
-          {% set current_filters = request.args.get('filters') %}
+          {% set current_filters = request.args.get('filters') if request.args else None %}
           {% if current_filters %}
             {% set src = h.url_for(
               'resource.view',
