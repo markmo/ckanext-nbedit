@@ -26,3 +26,7 @@
   font-weight: 600;
   font-style: italic;
 }
+
+body > .nbframe {
+  height: 100vh;
+}
