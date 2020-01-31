@@ -18,7 +18,17 @@ def start_server(context, data_dict):
     resp = requests.post(url, headers=headers, json={
         'kubespawner_override': {
             'environment': {
-                'CKAN_API_TOKEN': get_or_bust(data_dict, 'ckan_api_token')
+                'API_TOKEN': get_or_bust(data_dict, 'ckan_api_token'),
+                'OAUTH_CLIENT_ID': get_or_bust(data_dict, 'oauth_client_id'),
+                'ACCOUNT_ID': get_or_bust(data_dict, 'account_id'),
+                'INSTANCE_BASE_URL': get_or_bust(data_dict, 'instance_base_url'),
+                'INSTANCE_HOST': get_or_bust(data_dict, 'instance_host'),
+                'AUTHORIZATION_SERVER_URL': get_or_bust(data_dict, 'authorization_server_url'),
+                'SHARED_SECRET': get_or_bust(data_dict, 'shared_secret'),
+                'SPACE_KEY': get_or_bust(data_dict, 'space_key'),
+                'CONTENT_ID': get_or_bust(data_dict, 'content_id'),
+                'REDIS_HOST': get_or_bust(data_dict, 'redis_host'),
+                'REDIS_PASSWORD': get_or_bust(data_dict, 'redis_password')
             }
         }
     })

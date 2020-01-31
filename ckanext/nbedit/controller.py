@@ -15,7 +15,14 @@ class JServerController(toolkit.BaseController):
         '''Start Jupyter Server.'''
         log.debug('Starting Jupyter Server...')
         try:
-            user_id = toolkit.c.userobj.id
+            # get query params
+            id = request.GET.get('id')
+            resource_id = request.GET.get('resource_id')
+            view_id = request.GET.get('view_id')
+
+            userobj = toolkit.c.userobj
+            user_id = userobj.id
+            ckan_api_token = userobj.apikey
             params = {
                 'jhub_api_url': plugin.jhub_api_url(),
                 'jhub_token': plugin.jhub_token(),
@@ -50,7 +57,17 @@ class JServerController(toolkit.BaseController):
                 'jhub_api_url': plugin.jhub_api_url(),
                 'user_id': user_id,
                 'user_token': token,
-                'ckan_api_token': None  # TODO
+                'ckan_api_token': ckan_api_token,
+                'oauth_client_id': '',
+                'account_id': '',
+                'instance_base_url': plugin.instance_base_url(),
+                'instance_host': plugin.instance_host(),
+                'authorization_server_url': '',
+                'shared_secret': '',
+                'space_key': '',
+                'content_id': id,
+                'redis_host': plugin.redis_host(),
+                'redis_password': plugin.redis_password()
             })
             has_started = False
             retry_count = 0
@@ -68,11 +85,6 @@ class JServerController(toolkit.BaseController):
                     status_code='500',
                     detail='Could not start server'
                 )
-
-            # get query params
-            id = request.GET.get('id')
-            resource_id = request.GET.get('resource_id')
-            view_id = request.GET.get('view_id')
 
         except requests.exceptions.HTTPError as err:
             log.error('HTTP Error: ' + str(err))

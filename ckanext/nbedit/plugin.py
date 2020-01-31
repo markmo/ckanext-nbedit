@@ -24,7 +24,23 @@ def jhub_token():
 
 
 def jhub_token_expiry_sec():
-    return config.get('jhub_token_expiry_sec', '14400')
+    return config.get('ckan.nbedit.jhub_token_expiry_sec', '14400')
+
+
+def redis_host():
+    return config.get('ckan.redis.host', 'redis-master.default.svc.cluster.local')
+
+
+def redis_password():
+    return config.get('ckan.redis.password', '')
+
+
+def instance_base_url():
+    return config.get('ckan.api_url', 'http://192.168.99.100:32574/api')
+
+
+def instance_host():
+    return config.get('ckan.site_host', '192.168.99.100:32574')
 
 
 class NbeditPlugin(plugins.SingletonPlugin):
