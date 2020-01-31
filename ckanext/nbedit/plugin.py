@@ -144,11 +144,14 @@ class NbeditPlugin(plugins.SingletonPlugin):
         log.debug('token: ' + token)
 
         url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
+        base_url = '{}/user/{}/'.format(jhub_public_proxy(), user_id)
         log.debug('url: ' + url)
         log.debug('server_is_running: ' + str(server_is_running))
         return {
+            'base_url': base_url,
             'jupyter_user_url': url,
-            'server_is_running': server_is_running
+            'server_is_running': server_is_running,
+            'token': token
         }
 
     def view_template(self, context, data_dict):
