@@ -19,6 +19,10 @@ def jhub_api_url():
     return urljoin(jhub_base_url(), 'hub/api')
 
 
+def jhub_public_proxy():
+    return config.get('ckan.nbedit.jhub_public_proxy', '')
+
+
 def jhub_token():
     return config.get('ckan.nbedit.jhub_token', '')
 
@@ -139,7 +143,7 @@ class NbeditPlugin(plugins.SingletonPlugin):
         )
         log.debug('token: ' + token)
 
-        url = '{}/user/{}/tree/?token={}'.format(jhub_base_url(), user_id, token)
+        url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
         log.debug('url: ' + url)
         log.debug('server_is_running: ' + str(server_is_running))
         return {
