@@ -2,7 +2,7 @@
 {% resource 'nbedit/nbedit-stop-server.js' %}
 {% resource 'nbedit/nbedit.css' %}
 {% if server_is_running %}
-    <iframe id="nbeditor" class="nbframe" src="{{ base_url }}{{ package['name'] }}?token={{ token }}" style="width: 100%;"></iframe>
+    <iframe id="nbeditor" class="nbframe" src="{{ base_url }}{{ resource['name'] }}?token={{ token }}" style="width: 100%;"></iframe>
 {% else %}
     <p class="nbedit-notice">Start Server to open notebook</p>
 {% endif %}
