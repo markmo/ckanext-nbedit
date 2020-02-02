@@ -4,5 +4,5 @@
 {% if server_is_running %}
     <iframe id="nbeditor" class="nbframe" src="{{ nb_base_url }}{{ resource['name'] }}?token={{ token }}" style="width: 100%;"></iframe>
 {% else %}
-    <p class="nbedit-notice">Start Server to open notebook</p>
+    <iframe id="nbviewer" class="nbframe" src="{{ nbviewer_host }}/url/{{ resource_url }}" style="width: 100%;"></iframe>
 {% endif %}

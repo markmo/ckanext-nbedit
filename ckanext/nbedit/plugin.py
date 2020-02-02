@@ -1,10 +1,12 @@
+import ckan.plugins as plugins
+import ckan.plugins.toolkit as toolkit
+import logging
+import os
+
 from ckan.common import config
 from ckanext.nbedit import actions
 from ckanext.nbedit.utils import merge_dict
-import ckan.plugins as plugins
-import ckan.plugins.toolkit as toolkit
 from urlparse import urljoin
-import logging
 
 log = logging.getLogger('ckanext-nbedit')
 
@@ -45,6 +47,14 @@ def instance_base_url():
 
 def instance_host():
     return config.get('ckan.site_host', '192.168.99.100:32574')
+
+def nbviewer_host():
+    '''Get nbviewer_host from the [app:main] section of your CKAN config file.'''
+    host = config.get('ckan.nbview.nbviewer_host', 'http://localhost:8080');
+    if (host.endswith('/')):
+        host = host[:-1]
+    
+    return host
 
 
 class NbeditPlugin(plugins.SingletonPlugin):
@@ -110,12 +120,24 @@ class NbeditPlugin(plugins.SingletonPlugin):
     def can_view(self, data_dict):
         supported_formats = ['ipynb']
         try:
-            return data_dict['resource'].get('format', '').lower() in supported_formats
-        except:
+            resource = toolkit.get_or_bust(data_dict, 'resource')
+            name, ext = os.path.splitext(resource.get('name', ''))
+            ext = ext[1:].lower() if ext else ''
+            log.debug("ext: '{}'".format(ext))
+            result = (ext in supported_formats)
+            log.debug('can_view? ' + str(result))
+            return result
+        except Exception as e:
+            log.debug('Error: ' + str(e))
+            log.debug('can_view? False')
             return False
 
     def setup_template_variables(self, context, data_dict):
+        from urlparse import urlparse
         log.debug('setup_template_variables')
+        resource_url = data_dict['resource']['url']
+        parts = urlparse(resource_url)
+        resource_url = parts.netloc + parts.path
         user_id = toolkit.c.userobj.id
         params = {
             'jhub_api_url': jhub_api_url(),
@@ -143,13 +165,15 @@ class NbeditPlugin(plugins.SingletonPlugin):
         )
         log.debug('token: ' + token)
 
-        url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
+        # url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
         nb_base_url = '{}/user/{}/notebooks/'.format(jhub_public_proxy(), user_id)
-        log.debug('url: ' + url)
+        log.debug('nb_base_url: ' + nb_base_url)
         log.debug('server_is_running: ' + str(server_is_running))
         return {
-            'jupyter_user_url': url,
+            # 'jupyter_user_url': url,
             'nb_base_url': nb_base_url,
+            'nbviewer_host': nbviewer_host(),
+            'resource_url': resource_url,
             'server_is_running': server_is_running,
             'token': token
         }
