@@ -7,6 +7,7 @@ log = logging.getLogger('ckanext-nbedit')
 
 
 def start_server(context, data_dict):
+    log.debug('action:start_server')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     url = '{}/users/{}/server'.format(jhub_api_url, user_id)
@@ -18,17 +19,17 @@ def start_server(context, data_dict):
     resp = requests.post(url, headers=headers, json={
         'kubespawner_override': {
             'environment': {
-                'API_TOKEN': get_or_bust(data_dict, 'ckan_api_token'),
-                'OAUTH_CLIENT_ID': get_or_bust(data_dict, 'oauth_client_id'),
                 'ACCOUNT_ID': get_or_bust(data_dict, 'account_id'),
+                'API_TOKEN': get_or_bust(data_dict, 'ckan_api_token'),
+                'AUTHORIZATION_SERVER_URL': get_or_bust(data_dict, 'authorization_server_url'),
+                'CONTENT_ID': get_or_bust(data_dict, 'content_id'),
                 'INSTANCE_BASE_URL': get_or_bust(data_dict, 'instance_base_url'),
                 'INSTANCE_HOST': get_or_bust(data_dict, 'instance_host'),
-                'AUTHORIZATION_SERVER_URL': get_or_bust(data_dict, 'authorization_server_url'),
-                'SHARED_SECRET': get_or_bust(data_dict, 'shared_secret'),
-                'SPACE_KEY': get_or_bust(data_dict, 'space_key'),
-                'CONTENT_ID': get_or_bust(data_dict, 'content_id'),
+                'OAUTH_CLIENT_ID': get_or_bust(data_dict, 'oauth_client_id'),
                 'REDIS_HOST': get_or_bust(data_dict, 'redis_host'),
-                'REDIS_PASSWORD': get_or_bust(data_dict, 'redis_password')
+                'REDIS_PASSWORD': get_or_bust(data_dict, 'redis_password'),
+                'SHARED_SECRET': get_or_bust(data_dict, 'shared_secret'),
+                'SPACE_KEY': get_or_bust(data_dict, 'space_key')
             }
         }
     })
@@ -38,6 +39,7 @@ def start_server(context, data_dict):
 
 
 def stop_server(context, data_dict):
+    log.debug('action:stop_server')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')
@@ -50,6 +52,7 @@ def stop_server(context, data_dict):
 
 @toolkit.side_effect_free
 def jhub_user_exists_and_server_running(context, data_dict):
+    log.debug('action:jhub_user_exists_and_server_running')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')
@@ -75,7 +78,20 @@ def jhub_user_exists_and_server_running(context, data_dict):
     )
 
 
+def create_jhub_group(context, data_dict):
+    log.debug('action:create_jhub_group')
+    jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
+    group_id = get_or_bust(data_dict, 'group_id')
+    jhub_token = get_or_bust(data_dict, 'jhub_token')
+    url = '{}/groups/{}'.format(jhub_api_url, group_id)
+    resp = requests.post(url, headers=_jhub_headers(jhub_token))
+    status_code = resp.status_code
+    if status_code < 200 or status_code > 299:
+        resp.raise_for_status()
+
+
 def create_jhub_user(context, data_dict):
+    log.debug('action:create_jhub_user')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')
@@ -87,6 +103,7 @@ def create_jhub_user(context, data_dict):
 
 
 def add_user_to_group(context, data_dict):
+    log.debug('action:add_user_to_group')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     group_id = get_or_bust(data_dict, 'group_id')
     user_id = get_or_bust(data_dict, 'user_id')
@@ -96,11 +113,20 @@ def add_user_to_group(context, data_dict):
         'users': [user_id]
     })
     status_code = resp.status_code
-    if status_code < 200 or status_code > 299:
+
+    if status_code == 404:
+        # group doesn't exist, db out of sync
+        # create the group now
+        create_jhub_group(context, data_dict)
+        # and try again
+        add_user_to_group(context, data_dict)
+
+    elif status_code < 200 or status_code > 299:
         resp.raise_for_status()
 
 
 def create_user_token(context, data_dict):
+    log.debug('action:create_user_token')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')

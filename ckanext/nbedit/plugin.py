@@ -6,15 +6,25 @@ import os
 from ckan.common import config
 from ckanext.nbedit import actions
 from ckanext.nbedit.utils import merge_dict
-from urlparse import urljoin
+from urlparse import urljoin, urlparse
 
 log = logging.getLogger('ckanext-nbedit')
 
 
 # Config settings
 
+def instance_base_url():
+    url = config.get('ckan.site_url', '')
+    return urljoin(url, 'api')
+
+
+def instance_host():
+    url = config.get('ckan.site_url', '')
+    return urlparse(url).netloc
+
+
 def jhub_base_url():
-    return config.get('ckan.nbedit.jhub_base_url', '')
+    return config.get('ckanext.nbedit.jhub_url', '').strip('/')
 
 
 def jhub_api_url():
@@ -22,44 +32,33 @@ def jhub_api_url():
 
 
 def jhub_public_proxy():
-    return config.get('ckan.nbedit.jhub_public_proxy', '')
+    return config.get('ckanext.nbedit.jhub_public_proxy', '')
 
 
 def jhub_token():
-    return config.get('ckan.nbedit.jhub_token', '')
+    return config.get('ckanext.nbedit.jhub_token', '')
 
 
 def jhub_token_expiry_sec():
-    return config.get('ckan.nbedit.jhub_token_expiry_sec', '14400')
+    return config.get('ckanext.nbedit.jhub_token_expiry_sec', '14400')
+
+
+def nbviewer_host():
+    return config.get('ckanext.nbview.nbviewer_host', '').strip('/')
 
 
 def redis_host():
-    return config.get('ckan.redis.host', 'redis-master.default.svc.cluster.local')
+    return config.get('ckanext.nbedit.jupyter_redis_host', '')
 
 
 def redis_password():
-    return config.get('ckan.redis.password', '')
-
-
-def instance_base_url():
-    return config.get('ckan.api_url', 'http://192.168.99.100:32574/api')
-
-
-def instance_host():
-    return config.get('ckan.site_host', '192.168.99.100:32574')
-
-def nbviewer_host():
-    '''Get nbviewer_host from the [app:main] section of your CKAN config file.'''
-    host = config.get('ckan.nbview.nbviewer_host', 'http://localhost:8080');
-    if (host.endswith('/')):
-        host = host[:-1]
-    
-    return host
+    return config.get('ckanext.nbedit.jupyter_redis_password', '')
 
 
 class NbeditPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IOrganizationController, inherit=True)
     plugins.implements(plugins.IResourceView)
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.ITemplateHelpers)
@@ -85,12 +84,13 @@ class NbeditPlugin(plugins.SingletonPlugin):
     # IActions
     def get_actions(self):
         return {
-            'start_server': actions.start_server,
-            'stop_server': actions.stop_server,
-            'jhub_user_exists_and_server_running': actions.jhub_user_exists_and_server_running,
-            'create_jhub_user': actions.create_jhub_user,
             'add_user_to_group': actions.add_user_to_group,
-            'create_user_token': actions.create_user_token
+            'create_jhub_group': actions.create_jhub_group,
+            'create_jhub_user': actions.create_jhub_user,
+            'create_user_token': actions.create_user_token,
+            'jhub_user_exists_and_server_running': actions.jhub_user_exists_and_server_running,
+            'start_server': actions.start_server,
+            'stop_server': actions.stop_server
         }
 
     # ITemplateHelpers
@@ -114,6 +114,20 @@ class NbeditPlugin(plugins.SingletonPlugin):
             action='delete'
         )
         return map
+
+    # IOrganizationController
+
+    def create(self, entity):
+        """Create matching JupyterHub Group for CKAN Organization."""
+        group_id = entity.id
+        log.debug('Creating group ' + group_id)
+        params = {
+            'group_id': group_id,
+            'jhub_api_url': jhub_api_url(),
+            'jhub_token': jhub_token()
+        }
+        toolkit.get_action('create_jhub_group')(None, params)
+
 
     # IResourceView
 
