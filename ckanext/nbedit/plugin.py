@@ -63,8 +63,6 @@ class NbeditPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.ITemplateHelpers)
 
-    _is_server_running = False
-
     def info(self):
         return {
             'name': 'nbedit',
@@ -96,7 +94,7 @@ class NbeditPlugin(plugins.SingletonPlugin):
     # ITemplateHelpers
     def get_helpers(self):
         return {
-            'is_server_running': lambda: self._is_server_running
+            'user_logged_in': lambda: toolkit.c.userobj is not None
         }
 
     # IRoutes
@@ -127,6 +125,7 @@ class NbeditPlugin(plugins.SingletonPlugin):
             'jhub_token': jhub_token()
         }
         toolkit.get_action('create_jhub_group')(None, params)
+        return entity
 
 
     # IResourceView
@@ -152,44 +151,51 @@ class NbeditPlugin(plugins.SingletonPlugin):
         resource_url = data_dict['resource']['url']
         parts = urlparse(resource_url)
         resource_url = parts.netloc + parts.path
-        user_id = toolkit.c.userobj.id
-        params = {
-            'jhub_api_url': jhub_api_url(),
-            'jhub_token': jhub_token(),
-            'user_id': user_id
-        }
-        user_exists, server_is_running = \
-            toolkit.get_action('jhub_user_exists_and_server_running')(context, params)
+        userobj = toolkit.c.userobj
+        user_logged_in = userobj is not None
+        nb_base_url = None
+        server_is_running = False
+        token = None
+        if user_logged_in:
+            user_id = userobj.id
+            params = {
+                'jhub_api_url': jhub_api_url(),
+                'jhub_token': jhub_token(),
+                'user_id': user_id
+            }
+            user_exists, server_is_running = \
+                toolkit.get_action('jhub_user_exists_and_server_running')(context, params)
 
-        if not user_exists:
-            toolkit.get_action('create_jhub_user')(context, params)
-            organization_list = \
-                toolkit.get_action('organization_list_for_user')(context, { id: user_id })
-            organization_id = organization_list[0]['id']
-            toolkit.get_action('add_user_to_group')(
+            log.debug('server_is_running: ' + str(server_is_running))
+
+            if not user_exists:
+                toolkit.get_action('create_jhub_user')(context, params)
+                organization_list = \
+                    toolkit.get_action('organization_list_for_user')(context, { id: user_id })
+                organization_id = organization_list[0]['id']
+                toolkit.get_action('add_user_to_group')(
+                    context,
+                    merge_dict(params, { 'group_id': organization_id })
+                )
+
+            token = toolkit.get_action('create_user_token')(
                 context,
-                merge_dict(params, { 'group_id': organization_id })
+                merge_dict(params, { 'jhub_token_expiry_sec': jhub_token_expiry_sec() })
             )
+            log.debug('token: ' + token)
 
-        self._server_is_running = server_is_running
+            # url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
+            nb_base_url = '{}/user/{}/notebooks/'.format(jhub_public_proxy(), user_id)
+            log.debug('nb_base_url: ' + nb_base_url)
 
-        token = toolkit.get_action('create_user_token')(
-            context,
-            merge_dict(params, { 'jhub_token_expiry_sec': jhub_token_expiry_sec() })
-        )
-        log.debug('token: ' + token)
-
-        # url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
-        nb_base_url = '{}/user/{}/notebooks/'.format(jhub_public_proxy(), user_id)
-        log.debug('nb_base_url: ' + nb_base_url)
-        log.debug('server_is_running: ' + str(server_is_running))
         return {
             # 'jupyter_user_url': url,
             'nb_base_url': nb_base_url,
             'nbviewer_host': nbviewer_host(),
             'resource_url': resource_url,
             'server_is_running': server_is_running,
-            'token': token
+            'token': token,
+            'user_logged_in': user_logged_in
         }
 
     def view_template(self, context, data_dict):
