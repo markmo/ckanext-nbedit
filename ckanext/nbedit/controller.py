@@ -26,7 +26,6 @@ class JServerController(toolkit.BaseController):
             params = {
                 'jhub_api_url': plugin.jhub_api_url(),
                 'jhub_token': plugin.jhub_token(),
-                'notebook_servername': plugin.notebook_servername(),
                 'user_id': user_id
             }
             jhub_user_exists_and_server_running = \
@@ -69,7 +68,7 @@ class JServerController(toolkit.BaseController):
                 'content_id': id,
                 'redis_host': plugin.redis_host(),
                 'redis_password': plugin.redis_password(),
-                'notebook_servername': plugin.notebook_servername()
+                'notebook_server_image': plugin.notebook_server_image()
             })
             has_started = False
             retry_count = 0
@@ -129,7 +128,6 @@ class JServerController(toolkit.BaseController):
             params = {
                 'jhub_api_url': plugin.jhub_api_url(),
                 'jhub_token': plugin.jhub_token(),
-                'notebook_servername': plugin.notebook_servername(),
                 'user_id': user_id
             }
             jhub_user_exists_and_server_running = \

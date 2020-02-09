@@ -47,8 +47,8 @@ def nbviewer_host():
     return config.get('ckanext.nbview.nbviewer_host', '').strip('/')
 
 
-def notebook_servername():
-    return config.get('ckanext.nbedit.notebook_servername', '')
+def notebook_server_image():
+    return config.get('ckanext.nbedit.notebook_server_image', None)
 
 
 def redis_host():

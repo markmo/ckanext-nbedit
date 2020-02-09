@@ -10,35 +10,35 @@ def start_server(context, data_dict):
     log.debug('action:start_server')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
-    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
-    log.debug('notebook_servername: ' + str(notebook_servername))
-    if notebook_servername:
-        url = '{}/users/{}/servers/{}'.format(jhub_api_url, user_id, notebook_servername)
-    else:
-        url = '{}/users/{}/server'.format(jhub_api_url, user_id)
-
+    notebook_server_image = get_or_bust(data_dict, 'notebook_server_image')
+    log.debug('notebook_server_image: ' + notebook_server_image)
+    url = '{}/users/{}/server'.format(jhub_api_url, user_id)
     log.debug('url: ' + url)
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'token ' + get_or_bust(data_dict, 'user_token')
     }
-    resp = requests.post(url, headers=headers, json={
-        'kubespawner_override': {
-            'environment': {
-                'ACCOUNT_ID': get_or_bust(data_dict, 'account_id'),
-                'API_TOKEN': get_or_bust(data_dict, 'ckan_api_token'),
-                'AUTHORIZATION_SERVER_URL': get_or_bust(data_dict, 'authorization_server_url'),
-                'CONTENT_ID': get_or_bust(data_dict, 'content_id'),
-                'INSTANCE_BASE_URL': get_or_bust(data_dict, 'instance_base_url'),
-                'INSTANCE_HOST': get_or_bust(data_dict, 'instance_host'),
-                'OAUTH_CLIENT_ID': get_or_bust(data_dict, 'oauth_client_id'),
-                'REDIS_HOST': get_or_bust(data_dict, 'redis_host'),
-                'REDIS_PASSWORD': get_or_bust(data_dict, 'redis_password'),
-                'SHARED_SECRET': get_or_bust(data_dict, 'shared_secret'),
-                'SPACE_KEY': get_or_bust(data_dict, 'space_key')
-            }
+    kubespawner_override = {
+        'environment': {
+            'ACCOUNT_ID': get_or_bust(data_dict, 'account_id'),
+            'API_TOKEN': get_or_bust(data_dict, 'ckan_api_token'),
+            'AUTHORIZATION_SERVER_URL': get_or_bust(data_dict, 'authorization_server_url'),
+            'CONTENT_ID': get_or_bust(data_dict, 'content_id'),
+            'INSTANCE_BASE_URL': get_or_bust(data_dict, 'instance_base_url'),
+            'INSTANCE_HOST': get_or_bust(data_dict, 'instance_host'),
+            'OAUTH_CLIENT_ID': get_or_bust(data_dict, 'oauth_client_id'),
+            'REDIS_HOST': get_or_bust(data_dict, 'redis_host'),
+            'REDIS_PASSWORD': get_or_bust(data_dict, 'redis_password'),
+            'SHARED_SECRET': get_or_bust(data_dict, 'shared_secret'),
+            'SPACE_KEY': get_or_bust(data_dict, 'space_key')
         }
+    }
+    if notebook_server_image is not None:
+        kubespawner_override.update({ 'image': notebook_server_image })
+
+    resp = requests.post(url, headers=headers, json={
+        'kubespawner_override': kubespawner_override
     })
     status_code = resp.status_code
     if status_code < 200 or status_code > 299:
@@ -50,13 +50,7 @@ def stop_server(context, data_dict):
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')
-    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
-    log.debug('notebook_servername: ' + str(notebook_servername))
-    if notebook_servername:
-        url = '{}/users/{}/servers/{}'.format(jhub_api_url, user_id, notebook_servername)
-    else:
-        url = '{}/users/{}/server'.format(jhub_api_url, user_id)
-
+    url = '{}/users/{}/server'.format(jhub_api_url, user_id)
     resp = requests.delete(url, headers=_jhub_headers(jhub_token))
     status_code = resp.status_code
     if status_code < 200 or status_code > 299:
@@ -85,15 +79,9 @@ def jhub_user_exists_and_server_running(context, data_dict):
     if not type(jhub_user) is dict:
         return (False, False)
 
-    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
-    if notebook_servername:
-        server_is_running = True if jhub_user['servers'] else False
-    else:
-        server_is_running = True if jhub_user['server'] else False
-
     return (
-        True if jhub_user['name'] else False,  # user exists
-        server_is_running
+        True if jhub_user['name'] else False,  # user_exists
+        True if jhub_user['server'] else False # server_is_running
     )
 
 
