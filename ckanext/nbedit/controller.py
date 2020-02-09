@@ -49,7 +49,7 @@ class JServerController(toolkit.BaseController):
             )
             if not token:
                 return toolkit.abort(
-                    status_code='500',
+                    status_code=500,
                     detail='Invalid user token'
                 )
             
@@ -83,7 +83,7 @@ class JServerController(toolkit.BaseController):
 
             if not has_started:
                 return toolkit.abort(
-                    status_code='500',
+                    status_code=500,
                     detail='Could not start server'
                 )
 
@@ -96,20 +96,20 @@ class JServerController(toolkit.BaseController):
             )
         except requests.exceptions.TooManyRedirects:
             log.error('Bad URL')
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except requests.exceptions.ConnectionError:
             log.error('Connection Error: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except requests.exceptions.RequestException as err:
             log.error('Request Exception: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except ValueError as err:  # json.decode.JSONDecodeError in python 3
             log.error('JSON Decode Error: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except Exception as err:
             log.error(err)
             log.error('General Exception: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
 
         # must come outside the try block; the 302 is raising an exception
         toolkit.redirect_to(
@@ -148,7 +148,7 @@ class JServerController(toolkit.BaseController):
 
             if not has_stopped:
                 return toolkit.abort(
-                    status_code='500',
+                    status_code=500,
                     detail='Could not stop server'
                 )
 
@@ -166,19 +166,19 @@ class JServerController(toolkit.BaseController):
             )
         except requests.exceptions.TooManyRedirects:
             log.error('Bad URL')
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except requests.exceptions.ConnectionError:
             log.error('Connection Error: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except requests.exceptions.RequestException as err:
             log.error('Request Exception: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except ValueError as err:
             log.error('JSON Decode Error: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
         except Exception as err:
             log.error('General Exception: ' + str(err))
-            return toolkit.abort(status_code='500', detail=str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
 
         # must come outside the try block; the 302 is raising an exception
         toolkit.redirect_to(

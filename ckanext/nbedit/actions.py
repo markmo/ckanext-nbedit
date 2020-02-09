@@ -79,9 +79,15 @@ def jhub_user_exists_and_server_running(context, data_dict):
     if not type(jhub_user) is dict:
         return (False, False)
 
+    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
+    if notebook_servername:
+        server_is_running = True if jhub_user['servers'] else False
+    else:
+        server_is_running = True if jhub_user['server'] else False
+
     return (
         True if jhub_user['name'] else False,  # user exists
-        True if jhub_user['server'] else False # server is running
+        server_is_running
     )
 
 
