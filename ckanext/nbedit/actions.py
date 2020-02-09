@@ -13,7 +13,7 @@ def start_server(context, data_dict):
     notebook_servername = get_or_bust(data_dict, 'notebook_servername')
     log.debug('notebook_servername: ' + str(notebook_servername))
     if notebook_servername:
-        url = '{}/users/{}/server/{}'.format(jhub_api_url, user_id, notebook_servername)
+        url = '{}/users/{}/servers/{}'.format(jhub_api_url, user_id, notebook_servername)
     else:
         url = '{}/users/{}/server'.format(jhub_api_url, user_id)
 
