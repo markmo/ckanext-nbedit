@@ -50,7 +50,13 @@ def stop_server(context, data_dict):
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     jhub_token = get_or_bust(data_dict, 'jhub_token')
-    url = '{}/users/{}/server'.format(jhub_api_url, user_id)
+    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
+    log.debug('notebook_servername: ' + str(notebook_servername))
+    if notebook_servername:
+        url = '{}/users/{}/servers/{}'.format(jhub_api_url, user_id, notebook_servername)
+    else:
+        url = '{}/users/{}/server'.format(jhub_api_url, user_id)
+
     resp = requests.delete(url, headers=_jhub_headers(jhub_token))
     status_code = resp.status_code
     if status_code < 200 or status_code > 299:
