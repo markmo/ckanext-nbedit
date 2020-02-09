@@ -10,7 +10,11 @@ def start_server(context, data_dict):
     log.debug('action:start_server')
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
-    url = '{}/users/{}/server'.format(jhub_api_url, user_id)
+    notebook_servername = get_or_bust(data_dict, 'notebook_servername')
+    if notebook_servername:
+        url = '{}/users/{}/server/{}'.format(jhub_api_url, user_id, notebook_servername)
+    else:
+        url = '{}/users/{}/server'.format(jhub_api_url, user_id)
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

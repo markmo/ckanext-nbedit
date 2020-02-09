@@ -67,7 +67,8 @@ class JServerController(toolkit.BaseController):
                 'space_key': '',
                 'content_id': id,
                 'redis_host': plugin.redis_host(),
-                'redis_password': plugin.redis_password()
+                'redis_password': plugin.redis_password(),
+                'notebook_servername': plugin.notebook_servername()
             })
             has_started = False
             retry_count = 0
