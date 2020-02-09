@@ -26,6 +26,7 @@ class JServerController(toolkit.BaseController):
             params = {
                 'jhub_api_url': plugin.jhub_api_url(),
                 'jhub_token': plugin.jhub_token(),
+                'notebook_servername': plugin.notebook_servername(),
                 'user_id': user_id
             }
             jhub_user_exists_and_server_running = \
@@ -128,6 +129,7 @@ class JServerController(toolkit.BaseController):
             params = {
                 'jhub_api_url': plugin.jhub_api_url(),
                 'jhub_token': plugin.jhub_token(),
+                'notebook_servername': plugin.notebook_servername(),
                 'user_id': user_id
             }
             jhub_user_exists_and_server_running = \
