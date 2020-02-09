@@ -165,7 +165,6 @@ class NbeditPlugin(plugins.SingletonPlugin):
             params = {
                 'jhub_api_url': jhub_api_url(),
                 'jhub_token': jhub_token(),
-                'notebook_servername': notebook_servername(),
                 'user_id': user_id
             }
             user_exists, server_is_running = \
