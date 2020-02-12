@@ -1,0 +1,25 @@
+{% ckan_extends %}
+
+<div class="actions">
+  {% if resource_view['view_type'] == 'nbedit' and h.user_logged_in() %}
+    <a id="start-server-btn" class="btn btn-default has-spinner"
+      href="{{ h.url_for('start-server', id=package['name'], resource_id=resource['id'], view_id=resource_view['id']) }}"
+      data-module="nbedit-start-server" data-module-id="{{ resource_view['id'] }}"
+      data-module-url="{{ h.url_for('resource_view', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], qualified=True) }}">
+      <i class="fa fa-server"></i>
+      <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+      <span class="text">{{ _("Start Server") }}</span>
+    </a>
+    <a id="stop-server-btn" class="btn btn-default has-spinner"
+      href="{{ h.url_for('stop-server', id=package['name'], resource_id=resource['id'], view_id=resource_view['id']) }}"
+      data-module="nbedit-stop-server" data-module-id="{{ resource_view['id'] }}"
+      data-module-url="{{ h.url_for('resource_view', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], qualified=True) }}">
+      <i class="fa fa-stop-circle"></i>
+      <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+      <span class="text">{{ _("Stop Server") }}</span>
+    </a>
+  {% endif %}
+  {% if not h.user_logged_in() %}
+    <div class="nbedit-message">{{ _('You must be logged in to start a notebook server') }}</div>
+  {% endif %}
+</div>
