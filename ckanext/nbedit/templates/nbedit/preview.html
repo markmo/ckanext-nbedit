@@ -4,5 +4,5 @@
 {% if server_is_running and h.user_logged_in() %}
     <iframe id="nbeditor" class="nbframe" src="{{ nb_base_url }}{{ resource['name'] }}?token={{ token }}" style="width: 100%;"></iframe>
 {% else %}
-    <iframe id="nbviewer" class="nbframe" src="{{ nbviewer_host }}/url/{{ resource_url }}?flush_cache=true" style="width: 100%;"></iframe>
+    <iframe id="nbviewer" class="nbframe" src="{{ nbviewer_host }}/url/{{ resource_url }}?flush_cache=true&token={{ c.userobj.apikey }}" style="width: 100%;"></iframe>
 {% endif %}
