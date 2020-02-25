@@ -47,6 +47,15 @@ def nbviewer_host():
     return config.get('ckanext.nbview.nbviewer_host', '').strip('/')
 
 
+def new_notebook_content():
+    return config.get('ckanext.nbedit.new_notebook_content',
+        '{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
+
+
+def new_notebook_filename():
+    return config.get('ckanext.nbedit.new_notebook_filename', 'notebook.ipynb')
+
+
 def notebook_server_image():
     return config.get('ckanext.nbedit.notebook_server_image', None)
 
@@ -57,6 +66,9 @@ def redis_host():
 
 def redis_password():
     return config.get('ckanext.nbedit.jupyter_redis_password', '')
+
+def site_url():
+    return config.get('ckan.site_url', '')
 
 
 class NbeditPlugin(plugins.SingletonPlugin):
@@ -114,6 +126,12 @@ class NbeditPlugin(plugins.SingletonPlugin):
             '/stop-server',
             controller='ckanext.nbedit.controller:JServerController',
             action='delete'
+        )
+        map.connect(
+            'new-notebook',
+            '/dataset/new-notebook/{package}',
+            controller='ckanext.nbedit.controller:NotebookController',
+            action='create'
         )
         return map
 

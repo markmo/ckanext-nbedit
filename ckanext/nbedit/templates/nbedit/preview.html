@@ -1,6 +1,6 @@
 {% resource 'nbedit/nbedit-start-server.js' %}
 {% resource 'nbedit/nbedit-stop-server.js' %}
-{% resource 'nbedit/nbedit.css' %}
+{# % resource 'nbedit/nbedit.css' % #}
 {% if server_is_running and h.user_logged_in() %}
     <iframe id="nbeditor" class="nbframe" src="{{ nb_base_url }}{{ resource['name'] }}?token={{ token }}" style="width: 100%;"></iframe>
 {% else %}

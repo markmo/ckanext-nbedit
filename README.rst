@@ -138,7 +138,7 @@ under ``[app:main]``::
 
     # The JupyterHub base url, just scheme, host and port. Leave off 
     # the trailing slash.
-    ckan.nbedit.jhub_base_url = http://192.168.99.101:31212
+    ckanext.nbedit.jhub_url = http://192.168.99.101:31212
 
     # API token generated and put in the JupyterHub config file, e.g.
     #
@@ -149,10 +149,25 @@ under ``[app:main]``::
     #       admin: true
     #       apiToken: 62b8ed0e59dca768f4ab782ebe0419558801e5c558c648da5f26e10cb1b7f289
     #
-    ckan.nbedit.jhub_token = 62b8ed0e59dca768f4ab782ebe0419558801e5c558c648da5f26e10cb1b7f289
+    ckanext.nbedit.jhub_token = 62b8ed0e59dca768f4ab782ebe0419558801e5c558c648da5f26e10cb1b7f289
 
     # Token expiry limit
-    ckan.nbedit.jhub_token_expiry_sec = 14400
+    ckanext.nbedit.jhub_token_expiry_sec = 14400
+
+    # The JupyterHub Public Proxy server to access Jupyter Notebooks
+    ckanext.nbedit.jhub_public_proxy = http://192.168.99.100:31212
+
+    # The Redis write host accessible from within the Kubernetes cluster
+    ckanext.nbedit.jupyter_redis_host = redis-master.default.svc.cluster.local
+
+    # The Redis password
+    ckanext.nbedit.jupyter_redis_password = changme
+
+    # Default content for a newly created notebook
+    ckanext.nbedit.new_notebook_content = {"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}
+
+    # Default filename for a newly created notebook
+    ckanext.nbedit.new_notebook_filename = notebook.ipynb
 
 
 ------------------------

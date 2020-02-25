@@ -2,6 +2,7 @@ from ckan.common import request
 from ckanext.nbedit.utils import merge_dict
 import ckan.plugins.toolkit as toolkit
 import ckanext.nbedit.plugin as plugin
+import io
 import logging
 import requests
 import time
@@ -188,3 +189,66 @@ class JServerController(toolkit.BaseController):
             resource_id=resource_id,
             view_id=view_id
         )
+
+
+class NotebookController(toolkit.BaseController):
+
+    def create(self, package):
+        '''Create notebook'''
+        log.debug('Creating notebook...')
+        empty_notebook_file = io.StringIO(unicode(plugin.new_notebook_content()))
+        try:
+            package_info = toolkit.get_action('package_show')(None, { 'id': package })
+            filelist = map(get_file, package_info['resources'])
+            default_filename = plugin.new_notebook_filename()
+            new_filename = default_filename
+
+            # add an index number to the filename if it already exists
+            i = 1
+            while new_filename in filelist:
+                new_filename = get_indexed_filename(default_filename, i)
+                i += 1
+
+            params = {
+                'package_id': package,
+                'name': new_filename,
+                'format': 'ipynb',
+                'mimetype': 'application/x-ipynb+json',
+                'resource_type': 'file.upload',
+                'upload': ('upload', empty_notebook_file)
+            }
+            resource = toolkit.get_action('resource_create')(None, params)
+            # log.debug(resource)
+            resource_id = resource['id']
+            url = '{}/dataset/{}/resource/{}/download/{}'.format(
+                plugin.site_url(), package_info['id'], resource_id, new_filename)
+
+            # update resource with url
+            toolkit.get_action('resource_update')(None, {
+                'id': resource_id,
+                'url': url
+            })
+
+        except Exception as err:
+            log.error(err)
+            log.error('General Exception: ' + str(err))
+            return toolkit.abort(status_code=500, detail=str(err))
+
+        toolkit.redirect_to(
+            controller='package',
+            action='resource_read',
+            id=package,
+            resource_id=resource_id,
+            # view_id=view_id  # use default view
+        )
+
+
+def get_file(resource):
+    url = resource['url']
+    filename = url[url.rfind('/') + 1:]
+    return filename
+
+
+def get_indexed_filename(filename, index):
+    name = filename[:filename.rfind('.')]
+    return name + str(index) + '.ipynb'

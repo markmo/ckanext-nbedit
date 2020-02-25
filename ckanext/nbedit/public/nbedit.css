@@ -37,3 +37,8 @@ body > .nbframe {
   vertical-align: middle;
   line-height: 1.42857143;
 }
+
+.nbedit-add-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
