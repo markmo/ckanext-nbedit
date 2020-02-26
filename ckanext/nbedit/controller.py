@@ -5,7 +5,9 @@ import ckanext.nbedit.plugin as plugin
 import io
 import logging
 import requests
+import sys
 import time
+import traceback
 
 log = logging.getLogger('ckanext-nbedit')
 
@@ -108,8 +110,8 @@ class JServerController(toolkit.BaseController):
             log.error('JSON Decode Error: ' + str(err))
             return toolkit.abort(status_code=500, detail=str(err))
         except Exception as err:
-            log.error(err)
             log.error('General Exception: ' + str(err))
+            traceback.print_exc(file=sys.stdout)
             return toolkit.abort(status_code=500, detail=str(err))
 
         # must come outside the try block; the 302 is raising an exception

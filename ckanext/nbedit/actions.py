@@ -11,7 +11,7 @@ def start_server(context, data_dict):
     jhub_api_url = get_or_bust(data_dict, 'jhub_api_url')
     user_id = get_or_bust(data_dict, 'user_id')
     notebook_server_image = get_or_bust(data_dict, 'notebook_server_image')
-    log.debug('notebook_server_image: ' + notebook_server_image)
+    log.debug('notebook_server_image: ' + (notebook_server_image or 'None'))
     url = '{}/users/{}/server'.format(jhub_api_url, user_id)
     log.debug('url: ' + url)
     headers = {

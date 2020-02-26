@@ -43,6 +43,10 @@ def jhub_token_expiry_sec():
     return config.get('ckanext.nbedit.jhub_token_expiry_sec', '14400')
 
 
+def jupyter_root():
+    return config.get('ckanext.nbedit.jupyter_root', 'ckan_project')
+
+
 def nbviewer_host():
     return config.get('ckanext.nbview.nbviewer_host', '').strip('/')
 
@@ -208,6 +212,12 @@ class NbeditPlugin(plugins.SingletonPlugin):
 
             # url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
             nb_base_url = '{}/user/{}/notebooks/'.format(jhub_public_proxy(), user_id)
+            root = jupyter_root()
+            if root:
+                nb_base_url += '{}/'.format(root)
+
+            nb_base_url += '{}/'.format(data_dict['package']['name'])
+
             log.debug('nb_base_url: ' + nb_base_url)
 
         return {
