@@ -169,6 +169,9 @@ under ``[app:main]``::
     # Default filename for a newly created notebook
     ckanext.nbedit.new_notebook_filename = notebook.ipynb
 
+    # webhdfs plugin root directory
+    ckanext.nbedit.jupyter_root = ckan_project
+
 
 ------------------------
 Development Installation
