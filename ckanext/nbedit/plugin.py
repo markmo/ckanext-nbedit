@@ -57,7 +57,7 @@ def nested_tree():
 
 def new_notebook_content():
     return config.get('ckanext.nbedit.new_notebook_content',
-        '{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
+        '{"cells":[{"cell_type":"code","source":[],"outputs":[],"execution_count":null,"metadata":{"trusted":true}}],"metadata":{"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},"nteract":{"version":"europa@0.1.0"},"language_info":{"name":"python","version":"3.7.4","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"}},"nbformat":4,"nbformat_minor":2}')
 
 
 def new_notebook_filename():
