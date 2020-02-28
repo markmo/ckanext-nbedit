@@ -51,6 +51,10 @@ def nbviewer_host():
     return config.get('ckanext.nbview.nbviewer_host', '').strip('/')
 
 
+def nested_tree():
+    return toolkit.asbool(config.get('ckanext.nbview.nested_tree', False))
+
+
 def new_notebook_content():
     return config.get('ckanext.nbedit.new_notebook_content',
         '{"nbformat": 4, "nbformat_minor": 2, "metadata": {}, "cells": []}')
@@ -212,11 +216,12 @@ class NbeditPlugin(plugins.SingletonPlugin):
 
             # url = '{}/user/{}/tree/?token={}'.format(jhub_public_proxy(), user_id, token)
             nb_base_url = '{}/user/{}/notebooks/'.format(jhub_public_proxy(), user_id)
-            root = jupyter_root()
-            if root:
-                nb_base_url += '{}/'.format(root)
+            if nested_tree():
+                root = jupyter_root()
+                if root:
+                    nb_base_url += '{}/'.format(root)
 
-            nb_base_url += '{}/'.format(data_dict['package']['name'])
+                nb_base_url += '{}/'.format(data_dict['package']['name'])
 
             log.debug('nb_base_url: ' + nb_base_url)
 
